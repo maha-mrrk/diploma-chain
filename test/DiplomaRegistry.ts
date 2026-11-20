@@ -306,4 +306,106 @@ it("should reject a second revocation", async function () {
     );
   });
 
+    it("should rotate a compromised issuer", async function () {
+    const { registry, owner, issuer } = await deployFixture();
+    const signers = await ethers.getSigners();
+    const replacement = signers[4];
+
+    await registry.connect(owner).rotateIssuer(
+      issuer.address,
+      replacement.address
+    );
+
+    assert.equal(await registry.authorizedIssuers(issuer.address), false);
+    assert.equal(await registry.authorizedIssuers(replacement.address), true);
+  });
+
+  it("should reject issuer rotation by an outsider", async function () {
+    const { registry, issuer, outsider } = await deployFixture();
+    const signers = await ethers.getSigners();
+
+    await assert.rejects(
+      registry.connect(outsider).rotateIssuer(
+        issuer.address,
+        signers[4].address
+      )
+    );
+  });
+
+  it("should reject rotation to the zero address", async function () {
+    const { registry, owner, issuer } = await deployFixture();
+
+    await assert.rejects(
+      registry.connect(owner).rotateIssuer(
+        issuer.address,
+        ethers.ZeroAddress
+      )
+    );
+  });
+
+  it("should revoke multiple diplomas from a compromised issuer", async function () {
+    const { registry, owner, issuer, student } = await deployFixture();
+
+    const hash1 = ethers.keccak256(ethers.toUtf8Bytes("diploma 1"));
+    const hash2 = ethers.keccak256(ethers.toUtf8Bytes("diploma 2"));
+
+    await registry.connect(issuer).issueDiploma(student.address, hash1, "uri1");
+    await registry.connect(issuer).issueDiploma(student.address, hash2, "uri2");
+
+    await registry.connect(owner).revokeIssuerDiplomas(
+      issuer.address,
+      [1n, 2n],
+      1 // Fraud
+    );
+
+    const result1 = await registry.verify(1n, hash1);
+    const result2 = await registry.verify(2n, hash2);
+
+    assert.equal(result1[3], 2n);
+    assert.equal(result2[3], 2n);
+  });
+
+  it("should reject bulk revocation by an outsider", async function () {
+    const { registry, outsider, issuer } = await deployFixture();
+
+    await assert.rejects(
+      registry.connect(outsider).revokeIssuerDiplomas(
+        issuer.address,
+        [1n],
+        1
+      )
+    );
+  });
+
+  it("should reject an empty bulk revocation batch", async function () {
+    const { registry, owner, issuer } = await deployFixture();
+
+    await assert.rejects(
+      registry.connect(owner).revokeIssuerDiplomas(
+        issuer.address,
+        [],
+        1
+      )
+    );
+  });
+
+  it("should reject diplomas that do not belong to the compromised issuer", async function () {
+    const { registry, owner, issuer, student } = await deployFixture();
+    const signers = await ethers.getSigners();
+
+    await registry.connect(issuer).issueDiploma(
+      student.address,
+      ethers.keccak256(ethers.toUtf8Bytes("diploma")),
+      "uri"
+    );
+
+    await assert.rejects(
+      registry.connect(owner).revokeIssuerDiplomas(
+        signers[4].address,
+        [1n],
+        1
+      )
+    );
+  });
+
 });

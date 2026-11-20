@@ -1,10 +1,10 @@
-
-# DiplomaRegistry - Smart Contract Interface
+﻿# DiplomaRegistry - Smart Contract Interface
 
 ## 1. Overview
 
-The DiplomaRegistry contract manages diploma issuance,
-revocation, verification and authorized institutions.
+The DiplomaRegistry smart contract manages diploma issuance, revocation, verification, and authorized issuer management.
+
+The contract uses OpenZeppelin Ownable for administrative access control.
 
 ## 2. Enums
 
@@ -22,99 +22,117 @@ revocation, verification and authorized institutions.
 
 ### F1 - Issue Diploma
 
-```solidity
-issueDiploma(
-    address student,
-    bytes32 diplomaHash,
-    string calldata metadataURI
-) returns (uint256 diplomaId)
-```
+    issueDiploma(address student, bytes32 diplomaHash, string calldata metadataURI)
+    external returns (uint256 diplomaId)
 
 Only authorized issuers can issue diplomas.
 
+Requirements:
+- Student address must not be zero.
+- Diploma hash must not be zero.
+- Diploma hash must not already exist.
+- Metadata URI must not be empty.
+
 ### F2 - Revoke Diploma
 
-```solidity
-revokeDiploma(
-    uint256 diplomaId,
-    RevocationReason reason
-)
-```
+    revokeDiploma(uint256 diplomaId, RevocationReason reason) external
 
-Only the original issuer or the contract owner
-can revoke a diploma.
+Only the original issuer or the contract owner can revoke a diploma.
 
-Implementation note:
-The revocation reason is provided as an enum and emitted
-as an enum in the Revoked event. It is also converted
-to a readable string and stored in the Diploma struct.
+The revocation reason is stored as a readable string and emitted as an enum in the Revoked event.
 
 ### F3 - Verify Diploma
 
-```solidity
-verify(
-    uint256 diplomaId,
-    bytes32 diplomaHash
-) view returns (
-    bool isValid,
-    address issuer,
-    uint64 issuedAt,
-    Status status
-)
-```
-The diploma is considered valid only if:
-- The diploma exists and its status is Valid.
-- The provided hash matches the stored diploma hash.
+    verify(uint256 diplomaId, bytes32 diplomaHash) external view returns (
+        bool isValid, address issuer, uint64 issuedAt, Status status
+    )
 
-A revoked diploma or an incorrect hash returns isValid = false.
+A diploma is valid only if:
+- Its status is Valid.
+- The provided hash matches the stored hash.
+
+A revoked diploma, nonexistent diploma, or incorrect hash returns isValid = false.
 
 ### F4 - Issuer Management
 
-```solidity
-addIssuer(address issuer)
-removeIssuer(address issuer)
-```
+    addIssuer(address issuer) external
+    removeIssuer(address issuer) external
 
-Only the contract owner can manage issuers.
+Only the contract owner can add or remove authorized issuers.
 
-## 4. Events
+Zero addresses and already-authorized issuers are rejected. Removing an unauthorized issuer is also rejected.
 
-```solidity
-event Issued(
-    uint256 indexed diplomaId,
-    address indexed student,
-    address indexed issuer,
-    bytes32 diplomaHash
-);
+### F5 - Compromised Issuer Rotation
 
-event Revoked(
-    uint256 indexed diplomaId,
-    address indexed issuer,
-    RevocationReason reason
-);
+    rotateIssuer(address oldIssuer, address newIssuer) external
 
-event IssuerAdded(address indexed issuer);
-event IssuerRemoved(address indexed issuer);
-```
+Only the contract owner can rotate an issuer.
 
-## 5. Security Rules
+This operation:
+- Removes authorization from the compromised issuer.
+- Authorizes the replacement issuer.
+- Emits IssuerRemoved, IssuerAdded, and IssuerRotated events.
 
-- No personal information stored on-chain.
-- Diploma hashes use SHA-256.
-- Duplicate hashes are rejected.
+The replacement address must not be zero, identical to the old issuer, or already authorized.
+
+Rotation does not automatically revoke previously issued diplomas. Use revokeIssuerDiplomas for that operation.
+
+### F6 - Bulk Diploma Revocation
+
+    revokeIssuerDiplomas(address compromisedIssuer, uint256[] calldata diplomaIds, RevocationReason reason) external
+
+Only the contract owner can call this function.
+
+It revokes multiple diplomas issued by the specified issuer.
+
+Requirements:
+- The batch must contain at least one diploma.
+- Maximum batch size: 50 diplomas.
+- Every diploma must exist.
+- Every diploma must belong to the specified issuer.
+- No diploma can already be revoked.
+
+Each successful revocation emits a Revoked event.
+
+Large sets of diplomas must be processed in multiple transactions.
+
+## 4. Public State Variables
+
+    mapping(uint256 => Diploma) public diplomas;
+    mapping(bytes32 => bool) public hashExists;
+    mapping(address => bool) public authorizedIssuers;
+    uint256 public constant MAX_BATCH_SIZE = 50;
+
+The public getters allow external applications to retrieve diploma information, hash registration status, issuer authorization, and the maximum batch size.
+
+## 5. Events
+
+    event Issued(uint256 indexed diplomaId, address indexed student, address indexed issuer, bytes32 diplomaHash);
+    event Revoked(uint256 indexed diplomaId, address indexed issuer, RevocationReason reason);
+    event IssuerAdded(address indexed issuer);
+    event IssuerRemoved(address indexed issuer);
+    event IssuerRotated(address indexed oldIssuer, address indexed newIssuer);
+
+## 6. Security Rules
+
 - Only authorized issuers can issue diplomas.
-- Only the original issuer or owner can revoke a diploma.
+- Only the original issuer or owner can revoke an individual diploma.
+- Only the owner can manage issuers and perform bulk revocations.
+- Zero addresses and invalid diploma data are rejected.
+- Duplicate diploma hashes are rejected.
+- A registered hash cannot be reused, even after revocation.
 - Revocation reasons are mandatory.
-- Administrative functions are restricted to the owner.
+- Bulk revocation is limited to 50 diplomas per transaction.
 - SHA-256 hashing is performed off-chain.
 - The resulting 32-byte hash is passed to the smart contract.
-- A previously registered hash cannot be reused, even after revocation.
-- No directly identifiable personal information is stored on-chain.
-- Only pseudonymous wallet addresses and necessary diploma data are stored on-chain.
+- No PDF document is stored directly on-chain.
+- Wallet addresses, diploma hashes, metadata URIs, and diploma records are publicly accessible on-chain.
+- Metadata must not expose sensitive personal information.
 
-## 6. Off-chain Data
+## 7. Off-chain Data
 
-PDF documents and diploma metadata are stored off-chain.
+PDF documents and additional diploma metadata are stored off-chain.
 
-The contract only stores the diploma hash,
-the metadata URI and necessary identifiers.
+The contract stores the diploma hash, issuer and student addresses, issuance timestamp, status, metadata URI, and revocation reason.
+
+The backend is responsible for document storage and metadata access.

@@ -36,9 +36,13 @@ contract DiplomaRegistry is Ownable {
     mapping(bytes32 => bool) public hashExists;
     mapping(address => bool) public authorizedIssuers;
 
+    uint256 public constant MAX_BATCH_SIZE = 50;
     uint256 private nextDiplomaId = 1;
 
     // Custom errors
+    error SameIssuerAddress();
+    error InvalidBatchSize();
+    error DiplomaNotIssuedByIssuer();
     error UnauthorizedIssuer();
     error InvalidStudentAddress();
     error InvalidDiplomaHash();
@@ -47,10 +51,18 @@ contract DiplomaRegistry is Ownable {
     error DiplomaAlreadyRevoked();
     error UnauthorizedRevocation();
     error InvalidMetadataURI();
+    error InvalidIssuerAddress();
     error IssuerAlreadyAuthorized();
     error IssuerNotAuthorized();
 
     // Events
+
+    event IssuerRotated(
+    address indexed oldIssuer,
+    address indexed newIssuer
+);
+
+
     event Issued(
         uint256 indexed diplomaId,
         address indexed student,
@@ -192,7 +204,7 @@ contract DiplomaRegistry is Ownable {
     function addIssuer(address issuer) external onlyOwner {
 
         if (issuer == address(0)) {
-            revert InvalidStudentAddress();
+            revert InvalidIssuerAddress();
         }
 
         if (authorizedIssuers[issuer]) {
@@ -218,7 +230,86 @@ contract DiplomaRegistry is Ownable {
 
         emit IssuerRemoved(issuer);
     }
+    /**
+ * @notice Replace a compromised issuer with a new authorized issuer.
+ * @dev Only the contract owner can rotate an issuer.
+ */
+function rotateIssuer(
+    address oldIssuer,
+    address newIssuer
+) external onlyOwner {
 
+    if (!authorizedIssuers[oldIssuer]) {
+        revert IssuerNotAuthorized();
+    }
+
+    if (newIssuer == address(0)) {
+        revert InvalidIssuerAddress();
+    }
+
+    if (oldIssuer == newIssuer) {
+        revert SameIssuerAddress();
+    }
+
+    if (authorizedIssuers[newIssuer]) {
+        revert IssuerAlreadyAuthorized();
+    }
+
+    authorizedIssuers[oldIssuer] = false;
+    authorizedIssuers[newIssuer] = true;
+
+    emit IssuerRemoved(oldIssuer);
+    emit IssuerAdded(newIssuer);
+    emit IssuerRotated(oldIssuer, newIssuer);
+}
+
+/**
+ * @notice Revoke multiple diplomas issued by a compromised issuer.
+ * @dev Only the owner can call this function.
+ *      The operation is limited to MAX_BATCH_SIZE diplomas per transaction.
+ */
+function revokeIssuerDiplomas(
+    address compromisedIssuer,
+    uint256[] calldata diplomaIds,
+    RevocationReason reason
+) external onlyOwner {
+
+    uint256 batchSize = diplomaIds.length;
+
+    if (
+        batchSize == 0 ||
+        batchSize > MAX_BATCH_SIZE
+    ) {
+        revert InvalidBatchSize();
+    }
+
+    for (uint256 i = 0; i < batchSize; i++) {
+
+        uint256 diplomaId = diplomaIds[i];
+        Diploma storage diploma = diplomas[diplomaId];
+
+        if (diploma.status == Status.None) {
+            revert DiplomaNotFound();
+        }
+
+        if (diploma.issuer != compromisedIssuer) {
+            revert DiplomaNotIssuedByIssuer();
+        }
+
+        if (diploma.status == Status.Revoked) {
+            revert DiplomaAlreadyRevoked();
+        }
+
+        diploma.status = Status.Revoked;
+        diploma.revocationReason = _reasonToString(reason);
+
+        emit Revoked(
+            diplomaId,
+            compromisedIssuer,
+            reason
+        );
+    }
+}
     /**
      * @dev Convert the revocation enum to a readable string.
      */
