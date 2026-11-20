@@ -1,4 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import WalletButton from './WalletButton'
+import { useWallet } from '../context/useWallet'
 
 const links = [
   { to: '/institution', label: 'Institution' },
@@ -7,6 +9,7 @@ const links = [
 ]
 
 export default function Layout() {
+  const { error } = useWallet()
   return (
     <>
       <header className="navbar">
@@ -22,8 +25,10 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+        <WalletButton />
       </header>
       <main className="container">
+        {error && <div className="alert alert-danger">{error}</div>}
         <Outlet />
       </main>
     </>

@@ -74,3 +74,22 @@ button {
 }
 
 button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.wallet { display: flex; align-items: center; gap: 0.5rem; }
+
+.chip {
+  font-size: 0.8rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+.chip-admin { border-color: var(--danger); color: var(--danger); }
+.chip-issuer { border-color: var(--success); color: var(--success); }
+
+.alert {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--warning);
+  border-radius: var(--radius);
+  color: var(--warning);
+}
