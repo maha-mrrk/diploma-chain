@@ -89,3 +89,46 @@ The current implementation enforces the main business rules for diploma issuance
 The main production considerations are owner-key security, protection of off-chain metadata, and consistent SHA-256 computation across the application.
 
 Further testing and an independent professional audit are recommended before production deployment.
+
+
+## 9. Static Analysis with Slither
+
+### Tool and Configuration
+
+- Tool: Slither
+- Version: 0.11.6
+- Solidity compiler used by Hardhat: 0.8.34
+- Analysis scope: 3 contracts
+- Detectors executed: 102
+
+### Results
+
+Slither reported 2 findings:
+
+1. **Different pragma directives**
+
+   The main contract uses Solidity pragma ^0.8.34,
+   while OpenZeppelin dependencies use ^0.8.20.
+
+   This is expected because OpenZeppelin supports a broader
+   range of compatible compiler versions.
+
+2. **Solidity version constraint**
+
+   Slither reports that the ^0.8.20 constraint includes
+   compiler versions affected by known issues.
+
+   The project is compiled using Solidity 0.8.34.
+   The warning concerns the dependency's declared version
+   range, not the actual compiler version used.
+
+### Conclusion
+
+No critical or high-severity vulnerability was reported
+by the executed Slither detectors.
+
+The two findings are related to compiler version declarations
+and do not independently establish an exploitable vulnerability.
+
+Static analysis is not a substitute for a professional
+smart contract security audit.
