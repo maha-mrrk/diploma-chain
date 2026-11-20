@@ -44,6 +44,11 @@ revokeDiploma(
 Only the original issuer or the contract owner
 can revoke a diploma.
 
+Implementation note:
+The revocation reason is provided as an enum and emitted
+as an enum in the Revoked event. It is also converted
+to a readable string and stored in the Diploma struct.
+
 ### F3 - Verify Diploma
 
 ```solidity
@@ -57,6 +62,11 @@ verify(
     Status status
 )
 ```
+The diploma is considered valid only if:
+- The diploma exists and its status is Valid.
+- The provided hash matches the stored diploma hash.
+
+A revoked diploma or an incorrect hash returns isValid = false.
 
 ### F4 - Issuer Management
 
@@ -96,6 +106,11 @@ event IssuerRemoved(address indexed issuer);
 - Only the original issuer or owner can revoke a diploma.
 - Revocation reasons are mandatory.
 - Administrative functions are restricted to the owner.
+- SHA-256 hashing is performed off-chain.
+- The resulting 32-byte hash is passed to the smart contract.
+- A previously registered hash cannot be reused, even after revocation.
+- No directly identifiable personal information is stored on-chain.
+- Only pseudonymous wallet addresses and necessary diploma data are stored on-chain.
 
 ## 6. Off-chain Data
 
