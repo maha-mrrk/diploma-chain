@@ -245,6 +245,32 @@ it("should prevent a removed issuer from issuing diplomas", async function () {
   );
 });
 
+it("should prevent a removed issuer from revoking its diplomas", async function () {
+  const { registry, owner, issuer, student, diplomaHash } =
+    await deployFixture();
+
+  // Issue a diploma while the issuer is authorized
+  await registry.connect(issuer).issueDiploma(
+    student.address,
+    diplomaHash,
+    "ipfs://example"
+  );
+
+  // Remove the issuer
+  await registry.connect(owner).removeIssuer(issuer.address);
+
+  // The removed issuer must no longer be able to revoke the diploma
+  await assert.rejects(
+    registry.connect(issuer).revokeDiploma(1, 0)
+  );
+
+  // The owner must still be able to revoke it
+  await registry.connect(owner).revokeDiploma(1, 0);
+
+  const diploma = await registry.diplomas(1);
+  assert.equal(diploma.status, 2n);
+});
+
 it("should reject a second revocation", async function () {
   const { registry, issuer, student, diplomaHash } =
     await deployFixture();

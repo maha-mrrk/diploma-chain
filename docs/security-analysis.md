@@ -22,12 +22,14 @@ This is an internal code review, not a formal security audit.
 
 ### Revocation
 
-- A diploma can only be revoked by its original issuer or the contract owner.
+- A diploma can be revoked by its original issuer only while that issuer remains authorized.
+- The contract owner can always revoke any diploma.
+- Removed or compromised issuers cannot revoke diplomas they previously issued.
 - A diploma cannot be revoked if it does not exist.
 - A diploma cannot be revoked more than once.
 - The revocation reason is recorded.
 
-**Assessment:** The revocation rules prevent unauthorized users from changing a diploma's status.
+**Assessment:** Revocation permissions are restricted to authorized original issuers and the contract owner. Removing an issuer also removes its individual revocation privileges.
 
 ### Issuer Management
 
@@ -35,8 +37,10 @@ This is an internal code review, not a formal security audit.
 - The zero address cannot be authorized.
 - Already authorized issuers cannot be added again.
 - Non-authorized issuers cannot be removed.
+- The owner can rotate a compromised issuer by removing the old address and authorizing a replacement.
+- The owner can revoke multiple diplomas issued by a compromised issuer in a single transaction, with a maximum batch size of 50.
 
-**Assessment:** Issuer management is protected by OpenZeppelin's `Ownable` access control.
+**Assessment:** Issuer management is protected by OpenZeppelin's `Ownable` access control. Rotation prevents the compromised address from issuing or individually revoking diplomas. Bulk revocation allows the owner to invalidate affected diplomas.
 
 ## 3. Diploma Integrity
 

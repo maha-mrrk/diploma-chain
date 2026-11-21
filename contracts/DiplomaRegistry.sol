@@ -153,8 +153,8 @@ contract DiplomaRegistry is Ownable {
         }
 
         if (
-            msg.sender != diploma.issuer &&
-            msg.sender != owner()
+            msg.sender != owner() &&
+            (msg.sender != diploma.issuer || !authorizedIssuers[msg.sender])
         ) {
             revert UnauthorizedRevocation();
         }

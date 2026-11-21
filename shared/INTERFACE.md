@@ -37,7 +37,10 @@ Requirements:
 
     revokeDiploma(uint256 diplomaId, RevocationReason reason) external
 
-Only the original issuer or the contract owner can revoke a diploma.
+The original issuer can revoke a diploma only while still authorized.
+The contract owner can always revoke a diploma, regardless of the issuer's authorization status.
+
+A removed or compromised issuer cannot revoke diplomas it previously issued.
 
 The revocation reason is stored as a readable string and emitted as an enum in the Revoked event.
 
@@ -116,7 +119,10 @@ The public getters allow external applications to retrieve diploma information, 
 ## 6. Security Rules
 
 - Only authorized issuers can issue diplomas.
-- Only the original issuer or owner can revoke an individual diploma.
+- Only an authorized original issuer or the contract owner can revoke an individual diploma.
+- Removing an issuer revokes its permission to issue and individually revoke diplomas.
+- The contract owner retains revocation authority over all diplomas.
+
 - Only the owner can manage issuers and perform bulk revocations.
 - Zero addresses and invalid diploma data are rejected.
 - Duplicate diploma hashes are rejected.
