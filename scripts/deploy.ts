@@ -1,54 +1,33 @@
+﻿import { network } from "hardhat";
 import fs from "node:fs";
 import path from "node:path";
-import { network } from "hardhat";
 
 const { ethers, networkName } = await network.connect();
-
 const [deployer] = await ethers.getSigners();
-console.log(`Réseau       : ${networkName}`);
-console.log(`Déployeur    : ${deployer.address}`);
 
-const registry = await ethers.deployContract("DiplomaRegistry");
+console.log(`Réseau   : ${networkName}`);
+console.log(`Déployeur: ${deployer.address}`);
+
+// Si le constructeur de M1 n'a pas d'argument, remplace [] par []
+const registry = await ethers.deployContract("DiplomaRegistry", []);
 await registry.waitForDeployment();
 
 const address = await registry.getAddress();
-const txHash = registry.deploymentTransaction()?.hash;
-const chainId = (await ethers.provider.getNetwork()).chainId;
+const receipt = await registry.deploymentTransaction()?.wait();
+const { chainId } = await ethers.provider.getNetwork();
 
-console.log(`DiplomaRegistry déployé à : ${address}`);
+const out = {
+  network: networkName,
+  chainId: Number(chainId),
+  address,
+  deployer: deployer.address,
+  blockNumber: receipt?.blockNumber ?? null,
+  deployedAt: new Date().toISOString(),
+};
 
-// Optionnel : autoriser un premier émetteur (ex. l'institution)
-const issuer = process.env.ISSUER_ADDRESS;
-if (issuer) {
-  const tx = await registry.addIssuer(issuer);
-  await tx.wait();
-  console.log(`Émetteur autorisé : ${issuer}`);
-}
+const dir = path.join("shared", "deployments");
+fs.mkdirSync(dir, { recursive: true });
+fs.writeFileSync(path.join(dir, `${networkName}.json`), JSON.stringify(out, null, 2));
 
-// On ne sauvegarde que les vrais réseaux (localhost, sepolia),
-// pas les réseaux simulés en mémoire qui disparaissent après le script.
-const isSimulated = networkName === "default" || networkName.startsWith("hardhat");
-
-if (!isSimulated) {
-  const dir = path.resolve("shared", "deployments");
-  fs.mkdirSync(dir, { recursive: true });
-  const file = path.join(dir, `${networkName}.json`);
-  fs.writeFileSync(
-    file,
-    JSON.stringify(
-      {
-        network: networkName,
-        chainId: chainId.toString(),
-        address,
-        deployer: deployer.address,
-        txHash,
-        deployedAt: new Date().toISOString(),
-      },
-      null,
-      2
-    )
-  );
-  console.log(`Adresse sauvegardée dans ${file}`);
-} else {
-  console.log("Réseau simulé : aucune adresse sauvegardée.");
-}
+console.log(`DiplomaRegistry déployé : ${address}`);
+console.log(`Écrit dans shared/deployments/${networkName}.json`);

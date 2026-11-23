@@ -1,0 +1,132 @@
+﻿
+Compiled 1 Solidity file with solc 0.8.34 (evm target: osaka)
+
+Running Solidity tests
+
+
+Running Mocha tests
+
+
+  DiplomaRegistry - tests compl├®mentaires
+    D├®ploiement
+      [32mÔ£ö[39m d├®finit le d├®ployeur comme owner
+      [32mÔ£ö[39m d├®marre sans ├®metteur autoris├® ni dipl├┤me
+      [32mÔ£ö[39m expose MAX_BATCH_SIZE = 50
+    ├ëmission
+      [32mÔ£ö[39m ├®met l'├®v├®nement Issued avec les bons arguments
+      [32mÔ£ö[39m stocke correctement tous les champs du dipl├┤me
+      [32mÔ£ö[39m incr├®mente les identifiants ├á partir de 1
+      [32mÔ£ö[39m refuse l'├®mission par le owner s'il n'est pas ├®metteur
+      [32mÔ£ö[39m autorise plusieurs ├®metteurs ind├®pendants
+      [32mÔ£ö[39m refuse un hash d├®j├á utilis├® m├¬me par un autre ├®metteur
+    V├®rification
+      [32mÔ£ö[39m retourne les infos d'un dipl├┤me valide
+      [32mÔ£ö[39m retourne invalide pour un identifiant inexistant
+      [32mÔ£ö[39m retourne invalide avec le hash d'un autre dipl├┤me
+      [32mÔ£ö[39m est appelable par n'importe qui
+      [32mÔ£ö[39m montre le statut Revoked apr├¿s r├®vocation
+    R├®vocation
+      [32mÔ£ö[39m ├®met l'├®v├®nement Revoked avec les bons arguments
+      [32mÔ£ö[39m stocke le motif lisible pour chaque raison
+      [32mÔ£ö[39m l'├®v├®nement ├®met l'├®metteur d'origine quand le owner r├®voque
+      [32mÔ£ö[39m refuse la r├®vocation par un autre ├®metteur autoris├®
+      [32mÔ£ö[39m refuse un motif hors enum
+      [32mÔ£ö[39m le hash reste r├®serv├® apr├¿s r├®vocation (pas de r├®-├®mission)
+      [32mÔ£ö[39m un ├®metteur retir├® peut encore r├®voquer ses propres dipl├┤mes
+    Gestion des ├®metteurs
+      [32mÔ£ö[39m ├®met IssuerAdded et IssuerRemoved
+      [32mÔ£ö[39m refuse removeIssuer par un non-owner
+      [32mÔ£ö[39m peut r├®autoriser un ├®metteur retir├®
+    Rotation d'├®metteur
+      [32mÔ£ö[39m ├®met IssuerRemoved, IssuerAdded et IssuerRotated
+      [32mÔ£ö[39m le nouvel ├®metteur peut ├®mettre, l'ancien non
+      [32mÔ£ö[39m refuse la rotation vers la m├¬me adresse
+      [32mÔ£ö[39m refuse la rotation d'un ├®metteur non autoris├®
+      [32mÔ£ö[39m refuse la rotation vers un ├®metteur d├®j├á autoris├®
+    R├®vocation par lot
+      [32mÔ£ö[39m ├®met un ├®v├®nement Revoked par dipl├┤me
+      [32mÔ£ö[39m accepte exactement 50 dipl├┤mes (68ms)
+      [32mÔ£ö[39m refuse un lot de 51 dipl├┤mes
+      [32mÔ£ö[39m refuse un lot contenant un dipl├┤me inexistant
+      [32mÔ£ö[39m refuse un lot contenant un dipl├┤me d├®j├á r├®voqu├®
+      [32mÔ£ö[39m annule tout le lot si un dipl├┤me est invalide (atomicit├®)
+    Propri├®t├® (Ownable)
+      [32mÔ£ö[39m transf├¿re la propri├®t├® et applique les nouveaux droits
+      [32mÔ£ö[39m renonce ├á la propri├®t├® : plus aucun ajout d'├®metteur possible
+    Sc├®nario complet
+      [32mÔ£ö[39m autorisation, ├®mission, v├®rification, r├®vocation, re-v├®rification
+
+  DiplomaRegistry
+    [32mÔ£ö[39m should authorize an issuer
+    [32mÔ£ö[39m should issue a diploma successfully
+    [32mÔ£ö[39m should reject unauthorized issuance
+    [32mÔ£ö[39m should reject duplicate diploma hashes
+    [32mÔ£ö[39m should revoke a diploma by its original issuer
+    [32mÔ£ö[39m should reject revocation by an outsider
+    [32mÔ£ö[39m should verify a valid diploma
+    [32mÔ£ö[39m should allow the owner to revoke a diploma
+    [32mÔ£ö[39m should reject a zero student address
+    [32mÔ£ö[39m should reject a zero diploma hash
+    [32mÔ£ö[39m should reject an empty metadata URI
+    [32mÔ£ö[39m should return false for an incorrect diploma hash
+    [32mÔ£ö[39m should return false after diploma revocation
+    [32mÔ£ö[39m should prevent a removed issuer from issuing diplomas
+    [32mÔ£ö[39m should reject a second revocation
+    [32mÔ£ö[39m should allow only the owner to add issuers
+    [32mÔ£ö[39m should reject revocation of a non-existent diploma
+    [32mÔ£ö[39m should reject adding the zero address as an issuer
+    [32mÔ£ö[39m should reject adding an already authorized issuer
+    [32mÔ£ö[39m should reject removing a non-authorized issuer
+    [32mÔ£ö[39m should rotate a compromised issuer
+    [32mÔ£ö[39m should reject issuer rotation by an outsider
+    [32mÔ£ö[39m should reject rotation to the zero address
+    [32mÔ£ö[39m should revoke multiple diplomas from a compromised issuer
+    [32mÔ£ö[39m should reject bulk revocation by an outsider
+    [32mÔ£ö[39m should reject an empty bulk revocation batch
+    [32mÔ£ö[39m should reject diplomas that do not belong to the compromised issuer
+
+
+  65 passing (681ms)
+
+
+65 passing (65 mocha)
+
+ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+Ôòæ                            Gas Usage Statistics                             Ôòæ
+ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+Ôòæ contracts/DiplomaRegistry.sol:DiplomaRegistry                               Ôòæ
+ÔòƒÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔòó
+Ôòæ Function name        Ôöé Min     Ôöé Average Ôöé Median  Ôöé Max     Ôöé #calls       Ôòæ
+ÔòƒÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔòó
+Ôòæ addIssuer            Ôöé 47867   Ôöé 47878   Ôöé 47879   Ôöé 47879   Ôöé 73           Ôòæ
+Ôòæ authorizedIssuers    Ôöé 24319   Ôöé 24329   Ôöé 24331   Ôöé 24331   Ôöé 5            Ôòæ
+Ôòæ diplomas             Ôöé 35151   Ôöé 35383   Ôöé 35330   Ôöé 35509   Ôöé 17           Ôòæ
+Ôòæ hashExists           Ôöé 24406   Ôöé 24406   Ôöé 24406   Ôöé 24406   Ôöé 2            Ôòæ
+Ôòæ issueDiploma         Ôöé 148916  Ôöé 149171  Ôöé 149192  Ôöé 149192  Ôöé 93           Ôòæ
+Ôòæ MAX_BATCH_SIZE       Ôöé 21456   Ôöé 21456   Ôöé 21456   Ôöé 21456   Ôöé 1            Ôòæ
+Ôòæ owner                Ôöé 23601   Ôöé 23601   Ôöé 23601   Ôöé 23601   Ôöé 1            Ôòæ
+Ôòæ removeIssuer         Ôöé 25950   Ôöé 25959   Ôöé 25962   Ôöé 25962   Ôöé 4            Ôòæ
+Ôòæ renounceOwnership    Ôöé 23540   Ôöé 23540   Ôöé 23540   Ôöé 23540   Ôöé 1            Ôòæ
+Ôòæ revokeDiploma        Ôöé 54978   Ôöé 55478   Ôöé 55065   Ôöé 57258   Ôöé 15           Ôòæ
+Ôòæ revokeIssuerDiplomas Ôöé 91547   Ôöé 621628  Ôöé 91547   Ôöé 1681790 Ôöé 3            Ôòæ
+Ôòæ rotateIssuer         Ôöé 51764   Ôöé 51768   Ôöé 51764   Ôöé 51776   Ôöé 3            Ôòæ
+Ôòæ transferOwnership    Ôöé 29004   Ôöé 29004   Ôöé 29004   Ôöé 29004   Ôöé 1            Ôòæ
+Ôòæ verify               Ôöé 27672   Ôöé 28741   Ôöé 28742   Ôöé 29800   Ôöé 12           Ôòæ
+ÔòƒÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔòó
+Ôòæ Deployment           Ôöé Min     Ôöé Average Ôöé Median  Ôöé Max     Ôöé #deployments Ôòæ
+ÔòƒÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔòó
+Ôòæ                      Ôöé 2004454 Ôöé 2004454 Ôöé 2004454 Ôöé 2004454 Ôöé 65           Ôòæ
+ÔòƒÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö┤ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö┤ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö┤ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔòó
+Ôòæ Bytecode size        Ôöé 8826    Ôöé                                            Ôòæ
+ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòºÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòºÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+
+
+node.exe : WARNING: hre.network.connect() is deprecated and will be removed in a future version. Use 
+hre.network.create() or hre.network.getOrCreate() instead.
+Au caractère Ligne:1 : 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: hre.ne...eate() instead.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

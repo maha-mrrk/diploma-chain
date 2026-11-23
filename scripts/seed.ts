@@ -1,31 +1,23 @@
+﻿import { network } from "hardhat";
 import fs from "node:fs";
-import path from "node:path";
-import { network } from "hardhat";
 
 const { ethers, networkName } = await network.connect();
+const signers = await ethers.getSigners();
+const [deployer] = signers;
 
-const file = path.resolve("shared", "deployments", `${networkName}.json`);
-if (!fs.existsSync(file)) {
-  throw new Error(`Déploie d'abord le contrat : ${file} est introuvable.`);
-}
-const { address } = JSON.parse(fs.readFileSync(file, "utf8"));
-const registry: any = await ethers.getContractAt("DiplomaRegistry", address);
+const dep = JSON.parse(fs.readFileSync(`shared/deployments/${networkName}.json`, "utf8"));
+const registry = await ethers.getContractAt("DiplomaRegistry", dep.address);
 
-const [owner, institution, student1, student2] = await ethers.getSigners();
-const h = (s: string) => ethers.keccak256(ethers.toUtf8Bytes(s));
+const tx0 = await registry.addIssuer(deployer.address);
+await tx0.wait();
+console.log(`Institution autorisée : ${deployer.address}`);
 
-if (!(await registry.authorizedIssuers(institution.address))) {
-  await (await registry.connect(owner).addIssuer(institution.address)).wait();
-}
-console.log(`Institution autorisée : ${institution.address}`);
+const student = signers[1]?.address ?? ethers.Wallet.createRandom().address;
 
-const demos = [
-  { student: student1.address, label: "demo-diplome-1", uri: "http://localhost:3001/diploma/demo1" },
-  { student: student2.address, label: "demo-diplome-2", uri: "http://localhost:3001/diploma/demo2" },
-];
-
-for (const d of demos) {
-  const tx = await registry.connect(institution).issueDiploma(d.student, h(d.label), d.uri);
+for (let i = 1; i <= 2; i++) {
+  const hash = ethers.sha256(ethers.toUtf8Bytes(`demo-diploma-${i}-${Date.now()}`));
+  const uri = `http://localhost:3001/diploma/${hash.slice(2)}`;
+  const tx = await registry.issueDiploma(student, hash, uri);
   await tx.wait();
-  console.log(`Diplôme émis pour ${d.student} (hash de "${d.label}")`);
+  console.log(`Diplôme ${i} émis : ${hash}`);
 }

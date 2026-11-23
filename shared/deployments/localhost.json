@@ -1,8 +1,8 @@
 {
   "network": "localhost",
-  "chainId": "31337",
+  "chainId": 31337,
   "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-  "txHash": "0x7026d94e50adf0ee46106ca5f63098c38f400bf4aaac2249bacf77f9c3764e2f",
-  "deployedAt": "2026-11-20T21:21:12.061Z"
+  "blockNumber": 1,
+  "deployedAt": "2026-11-20T22:38:48.836Z"
 }
