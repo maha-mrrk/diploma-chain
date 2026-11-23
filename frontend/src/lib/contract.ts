@@ -6,7 +6,7 @@ import {
   type ContractRunner,
 } from 'ethers'
 import abi from '../../../shared/abi/DiplomaRegistry.json'
-import { CONTRACT_ADDRESS, SUPPORTED_NETWORKS } from './config'
+import { getContractAddress, SUPPORTED_NETWORKS } from './config'
 
 type InjectedProvider = Eip1193Provider & {
   on?: (event: string, handler: (...args: unknown[]) => void) => void
@@ -103,15 +103,13 @@ export async function switchNetwork(chainId: number): Promise<void> {
   }
 }
 
-/** Instance du contrat. Signer = écriture, Provider = lecture seule. */
-export function getContract(runner: ContractRunner): Contract {
-  if (!CONTRACT_ADDRESS || /^0x0+$/.test(CONTRACT_ADDRESS)) {
-    throw new WalletError(
-      'NO_CONTRACT',
-      'Adresse du contrat non configurée (VITE_CONTRACT_ADDRESS).',
-    )
+/** Instance du contrat pour un réseau donné. Signer = écriture, Provider = lecture seule. */
+export function getContract(runner: ContractRunner, chainId: number): Contract {
+  const address = getContractAddress(chainId)
+  if (!address) {
+    throw new WalletError('NO_CONTRACT', 'Aucun contrat déployé sur ce réseau.')
   }
-  return new Contract(CONTRACT_ADDRESS, abi, runner)
+  return new Contract(address, abi, runner)
 }
 
 /** Rôles du compte : owner (admin) et/ou émetteur autorisé. */
@@ -144,7 +142,12 @@ export function onWalletChange(handler: () => void): () => void {
 /** Convertit n'importe quelle erreur (ethers, MetaMask, contrat) en message clair. */
 export function toWalletError(err: unknown): WalletError {
   if (err instanceof WalletError) return err
-  const e = err as { code?: string | number; revert?: { name?: string }; shortMessage?: string; message?: string }
+  const e = err as {
+    code?: string | number
+    revert?: { name?: string }
+    shortMessage?: string
+    message?: string
+  }
   const code = e?.code
   const revertName = e?.revert?.name ?? ''
 

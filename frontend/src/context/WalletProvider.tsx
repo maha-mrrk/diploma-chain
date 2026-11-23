@@ -30,12 +30,12 @@ export default function WalletProvider({ children }: { children: ReactNode }) {
         return
       }
       try {
-        setRoles(await getRoles(getContract(s.signer), s.address))
+        setRoles(await getRoles(getContract(s.signer, s.chainId), s.address))
       } catch (err) {
         const e = err as { code?: string }
         setError(
           e?.code === 'BAD_DATA'
-            ? 'Contrat introuvable à cette adresse sur ce réseau.'
+            ? 'Contrat introuvable à cette adresse. Le nœud local a-t-il été redémarré ? Redéployez le contrat.'
             : toWalletError(err).message,
         )
       }
