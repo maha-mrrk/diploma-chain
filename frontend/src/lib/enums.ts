@@ -1,12 +1,14 @@
-// ⚠️ À vérifier dans shared/INTERFACE.md ou contracts/DiplomaRegistry.sol
-// (enums RevocationReason et Status) : l'ordre doit être identique.
+// Valeurs alignées sur shared/INTERFACE.md (enums de DiplomaRegistry.sol).
 export const REVOCATION_REASONS = [
-  { value: 0, label: 'Erreur de saisie' },
-  { value: 1, label: 'Fraude' },
-  { value: 2, label: 'Plagiat' },
+  { value: 0, label: 'Erreur de saisie' }, // DataEntryError
+  { value: 1, label: 'Fraude' },           // Fraud
+  { value: 2, label: 'Plagiat' },          // Plagiarism
 ] as const
 
+export const STATUS = { None: 0, Valid: 1, Revoked: 2 } as const
+
 export const STATUS_LABELS: Record<number, string> = {
-  0: 'Valide',
-  1: 'Révoqué',
+  0: 'Inexistant',
+  1: 'Valide',
+  2: 'Révoqué',
 }
