@@ -4,6 +4,7 @@ import { useWallet } from '../context/useWallet'
 import { hashFile, isPdf } from '../lib/hash'
 import { uploadDiploma } from '../lib/api'
 import { getContract, toWalletError, txUrl } from '../lib/contract'
+import IssuedDiplomas from '../components/IssuedDiplomas'
 
 type Step = 'idle' | 'uploading' | 'signing' | 'pending' | 'confirmed' | 'error'
 
@@ -248,6 +249,7 @@ export default function Institution() {
           Identifiant du diplôme : <strong>{diplomaId}</strong>
         </p>
       )}
+          <IssuedDiplomas refreshKey={formKey} />
     </section>
   )
 }

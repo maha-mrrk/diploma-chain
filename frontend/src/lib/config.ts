@@ -17,6 +17,7 @@ export const SUPPORTED_NETWORKS: Record<number, NetworkInfo> = {
 
 interface Deployment {
   address?: string
+  blockNumber?: number
 }
 
 // Charge tous les fichiers shared/deployments/*.json présents.
@@ -31,4 +32,12 @@ export function getContractAddress(chainId: number): string {
   if (!name) return ''
   const entry = Object.entries(deployments).find(([path]) => path.endsWith(`/${name}.json`))
   return entry?.[1].address ?? ''
+}
+
+/** Bloc de déploiement du contrat (point de départ de la lecture des événements). */
+export function getDeploymentBlock(chainId: number): number {
+  const name = SUPPORTED_NETWORKS[chainId]?.deployment
+  if (!name) return 0
+  const entry = Object.entries(deployments).find(([path]) => path.endsWith(`/${name}.json`))
+  return Math.max(0, entry?.[1].blockNumber ?? 0)
 }

@@ -93,3 +93,27 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border-radius: var(--radius);
   color: var(--warning);
 }
+
+.issued { margin-top: 2.5rem; }
+.issued-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { color: var(--muted); font-weight: 600; }
+
+.badge { padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.8rem; border: 1px solid var(--border); }
+.badge-valid { border-color: var(--success); color: var(--success); }
+.badge-revoked { border-color: var(--danger); color: var(--danger); }
+
+.confirm { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+select {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+button.danger { background: var(--danger); color: #fff; }
+button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
