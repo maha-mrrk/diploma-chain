@@ -117,3 +117,41 @@ select {
 }
 button.danger { background: var(--danger); color: #fff; }
 button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+.form { display: flex; flex-direction: column; gap: 1rem; max-width: 560px; }
+.field { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.95rem; }
+.row { display: flex; gap: 1rem; }
+.row .field { flex: 1; }
+
+input {
+  font: inherit;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.hint { font-size: 0.85rem; color: var(--muted); word-break: break-all; }
+
+.status { padding: 0.6rem 0.9rem; border-radius: var(--radius); border: 1px solid var(--border); }
+.status-confirmed { border-color: var(--success); color: var(--success); }
+.status-error { border-color: var(--danger); color: var(--danger); }
+.status-uploading, .status-signing, .status-pending { border-color: var(--warning); color: var(--warning); }
+
+.panel { margin-top: 2rem; }
+.panel h2 { margin-bottom: 0.6rem; }
+
+.inline-form { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.inline-form input { flex: 1; min-width: 240px; }
+
+.list { list-style: none; padding: 0; margin: 0; }
+.list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  word-break: break-all;
+}
